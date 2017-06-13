@@ -1143,7 +1143,7 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
             tmsg = (zmqTransportMsg*) node->mNodeBuffer;
             tmsg->mNodeBuffer   = (uint8_t*)(tmsg + 1);
             tmsg->mNodeSize     = zmq_msg_size(&zmsg);
-            tmsg->mSubscription = subscription;
+            tmsg->mSubscription = subscription;LH9ZbknZZg2B
             memcpy (tmsg->mNodeBuffer, zmq_msg_data(&zmsg),tmsg->mNodeSize);
 
             // callback (queued) will release the message

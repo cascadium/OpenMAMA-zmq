@@ -11,7 +11,7 @@ notifications:
 before_install:
   - export SOURCE_DIR=`pwd`
   - sudo apt-get update -qq
-  - sudo apt-get install -y scons git flex uuid-dev libevent-dev cmake git libzmq3-dev
+  - sudo apt-get install -y scons git flex uuid-dev libevent-dev cmake git libzmq3-dev libgtest-dev
   - cd
   - wget https://github.com/apache/qpid-proton/archive/0.10.tar.gz -O proton.tgz
   - tar xvf proton.tgz
@@ -23,7 +23,8 @@ before_install:
   - cd
   - git clone https://github.com/OpenMAMA/OpenMAMA.git
   - cd OpenMAMA
-  - scons product=mama middleware=qpid
+  - "cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo mv libg* /usr/local/lib/ ; cd -"
+  - scons product=mama middleware=qpid with_unittest=y gtest_home=/usr/local
   - export MAMA_SOURCE=$(pwd)
   - export MAMA_INSTALL=$MAMA_SOURCE/$(ls -1 | grep "openmama_install_*")
   - export WOMBAT_PATH=$MAMA_SOURCE/OpenMAMA/mama/c_cpp/src/gunittest/c:$SOURCE_DIR/config
