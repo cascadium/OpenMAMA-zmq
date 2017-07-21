@@ -11,7 +11,7 @@ notifications:
 before_install:
   - export SOURCE_DIR=`pwd`
   - sudo apt-get update -qq
-  - sudo apt-get install -y scons git flex uuid-dev libevent-dev cmake git libzmq3-dev libgtest-dev
+  - sudo apt-get install -y scons git flex uuid-dev libevent-dev cmake git libzmq3-dev libgtest-dev libapr1-dev
   - cd
   - wget https://github.com/apache/qpid-proton/archive/0.10.tar.gz -O proton.tgz
   - tar xvf proton.tgz
