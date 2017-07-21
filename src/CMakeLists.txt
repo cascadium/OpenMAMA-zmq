@@ -7,6 +7,8 @@ include_directories(${EVENT_ROOT}/include)
 include_directories(${ZMQ_ROOT}/include)
 
 link_directories(${MAMA_ROOT}/lib)
+link_directories(${MAMA_ROOT}/lib/dynamic)
+link_directories(${MAMA_ROOT}/lib/dynamic-debug)
 link_directories(${ZMQ_ROOT}/lib)
 link_directories(${EVENT_ROOT}/lib)
 
