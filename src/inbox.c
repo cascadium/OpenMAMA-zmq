@@ -18,7 +18,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE UfSE OR OTHER DEALINGS IN
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
@@ -34,6 +34,9 @@
 #include "inbox.h"
 #include "zmqbridgefunctions.h"
 
+extern subscriptionBridge
+mamaSubscription_getSubscriptionBridge(
+    mamaSubscription subscription);
 
 /*=========================================================================
   =                              Macros                                   =
@@ -48,13 +51,13 @@
 
 typedef struct zmqInboxImpl
 {
-    char                            mInbox[MAX_SUBJECT_LENGTH];
     mamaSubscription                mSubscription;
     void*                           mClosure;
     mamaInboxMsgCallback            mMsgCB;
     mamaInboxErrorCallback          mErrCB;
     mamaInboxDestroyCallback        mOnInboxDestroyed;
     mamaInbox                       mParent;
+    zmqBridgeMsgReplyHandle         mReplyHandle;
 } zmqInboxImpl;
 
 /*=========================================================================
@@ -194,9 +197,9 @@ zmqBridgeMamaInbox_createByIndex   (inboxBridge*             bridge,
     wUuid_generate_time     (tempUuid);
     wUuid_unparse           (tempUuid, uuidStringBuffer);
 
-    /* Create the unique topic name allocated to this inbox */
-    snprintf (impl->mInbox,
-              sizeof (impl->mInbox) - 1,
+    /* Create the unique name allocated to this inbox */
+    snprintf (impl->mReplyHandle.mInboxName,
+              sizeof (impl->mReplyHandle.mInboxName) - 1,
               "_INBOX.%s",
               uuidStringBuffer);
 
@@ -218,12 +221,21 @@ zmqBridgeMamaInbox_createByIndex   (inboxBridge*             bridge,
     impl->mParent           = parent;
     impl->mOnInboxDestroyed = onInboxDestroyed;
 
+    // TODO: make this thread-safe
+    static char replyTo[ZMQ_MSG_PROPERTY_LEN] = "";
+    if (strlen(replyTo) == 0) {
+       char host[MAXHOSTNAMELEN + 1] = {0};
+       gethostname(host, MAXHOSTNAMELEN);
+       snprintf(replyTo, sizeof(replyTo) -1, "_INBOX.%s.%05d", host, getpid());
+    }
+    strcpy(impl->mReplyHandle.mReplyTo, replyTo);
+
     /* Subscribe to the inbox topic name */
     status = mamaSubscription_createBasic (impl->mSubscription,
                                            transport,
                                            queue,
                                            &cb,
-                                           impl->mInbox,
+                                           impl->mReplyHandle.mReplyTo,
                                            impl);
     if (MAMA_STATUS_OK != status)
     {
@@ -245,17 +257,34 @@ mama_status
 zmqBridgeMamaInbox_destroy (inboxBridge inbox)
 {
     zmqInboxImpl* impl = (zmqInboxImpl*) inbox;
-
-    if (NULL != impl)
-    {
-        mamaSubscription_destroy    (impl->mSubscription);
-        mamaSubscription_deallocate (impl->mSubscription);
-        free (impl);
-    }
-    else
+    if (NULL == impl)
     {
         return MAMA_STATUS_NULL_ARG;
     }
+
+    mama_status status;
+
+    // immediately stop the subscription
+    subscriptionBridge subBridge = mamaSubscription_getSubscriptionBridge(impl->mSubscription);
+    status = zmqBridgeMamaSubscriptionImpl_deactivate(subBridge);
+    if (MAMA_STATUS_OK != status)
+    {
+       mama_log (MAMA_LOG_LEVEL_ERROR,
+                 "zmqBridgeMamaSubscriptionImpl_deactivate(): "
+                 "Failed to deactivate subscription ");
+       return status;
+    }
+
+    // queue up the destroy
+    status = mamaSubscription_destroyEx (impl->mSubscription);
+    if (MAMA_STATUS_OK != status)
+    {
+       mama_log (MAMA_LOG_LEVEL_ERROR,
+                 "mamaSubscription_destroyEx(): "
+                 "Failed ");
+       return status;
+    }
+
     return MAMA_STATUS_OK;
 }
 
@@ -264,15 +293,15 @@ zmqBridgeMamaInbox_destroy (inboxBridge inbox)
   =                  Public implementation functions                      =
   =========================================================================*/
 
-const char*
-zmqBridgeMamaInboxImpl_getReplySubject (inboxBridge inbox)
+zmqBridgeMsgReplyHandle*
+zmqBridgeMamaInboxImpl_getReplyHandle (inboxBridge inbox)
 {
     zmqInboxImpl* impl = (zmqInboxImpl*) inbox;
     if (NULL == impl)
     {
         return NULL;
     }
-    return impl->mInbox;
+    return &impl->mReplyHandle;
 }
 
 
@@ -293,6 +322,14 @@ zmqBridgeMamaInboxImpl_onMsg (mamaSubscription    subscription,
         return;
     }
 
+   // is this our reply?
+   msgBridge tmp;
+   mamaMsgImpl_getBridgeMsg(msg, &tmp);
+   char* inboxName;
+   zmqBridgeMamaMsgImpl_getInboxName(tmp, &inboxName);
+   if (strcmp(inboxName, impl->mReplyHandle.mInboxName) != 0)
+      return;
+
     /* If a message callback is defined, call it */
     if (NULL != impl->mMsgCB)
     {
@@ -307,23 +344,28 @@ zmqBridgeMamaInboxImpl_onCreate (mamaSubscription    subscription,
 {
 }
 
-/* Calls the implementation's destroy callback on execution */
+/*
+   Calls the implementation's destroy callback on execution
+   Also deallocates the subscription and frees the inbox impl
+*/
 static void MAMACALLTYPE
 zmqBridgeMamaInboxImpl_onDestroy (mamaSubscription    subscription,
                                   void*               closure)
 {
     /* The closure provided is the zmq inbox implementation */
     zmqInboxImpl* impl = (zmqInboxImpl*) closure;
-    if (NULL == impl)
+    if (NULL != impl)
     {
-        return;
+       /* Call the zmq inbox destroy callback if defined */
+       if (NULL != impl->mOnInboxDestroyed)
+       {
+           (impl->mOnInboxDestroyed)(impl->mParent, impl->mClosure);
+       }
+
+       free (impl);
     }
 
-    /* Call the zmq inbox destroy callback if defined */
-    if (NULL != impl->mOnInboxDestroyed)
-    {
-        (impl->mOnInboxDestroyed)(impl->mParent, impl->mClosure);
-    }
+    mamaSubscription_deallocate (subscription);
 }
 
 /* Calls the implementation's error callback on execution */
@@ -347,5 +389,3 @@ zmqBridgeMamaInboxImpl_onError (mamaSubscription    subscription,
         (impl->mErrCB)(status, impl->mClosure);
     }
 }
-
-
