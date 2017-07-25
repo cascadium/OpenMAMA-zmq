@@ -856,7 +856,7 @@ zmqBridgeMamaTransportImpl_start (zmqTransportBridge* impl)
 mama_status zmqBridgeMamaTransportImpl_stop (zmqTransportBridge* impl)
 {
     /* There are two mechanisms by which we can stop the transport
-     * - Send a special message, which will be picked up by recv 
+     * - Send a special message, which will be picked up by recv
      *   For the instance when there is very little data flowing.
      * - Set the mIsDispatching variable in the transportBridge object to
      *   false, for instances when there is a lot of data flowing.
@@ -1062,7 +1062,7 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
     /*
      * Check if we should be still dispatching.
      * We shouldn't need to lock around this, as we're performing a simple value
-     * read - if it changes in the middle of the read, we don't actually care. 
+     * read - if it changes in the middle of the read, we don't actually care.
      */
     zmq_msg_t zmsg;
     zmq_msg_init (&zmsg);
@@ -1143,7 +1143,7 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
             tmsg = (zmqTransportMsg*) node->mNodeBuffer;
             tmsg->mNodeBuffer   = (uint8_t*)(tmsg + 1);
             tmsg->mNodeSize     = zmq_msg_size(&zmsg);
-            tmsg->mSubscription = subscription;LH9ZbknZZg2B
+            tmsg->mSubscription = subscription;
             memcpy (tmsg->mNodeBuffer, zmq_msg_data(&zmsg),tmsg->mNodeSize);
 
             // callback (queued) will release the message
