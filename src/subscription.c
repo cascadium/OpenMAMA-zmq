@@ -26,17 +26,18 @@
   =                             Includes                                  =
   =========================================================================*/
 
+#include <stdint.h>
 #include <string.h>
 #include <mama/mama.h>
-#include <subscriptionimpl.h>
-#include <transportimpl.h>
-#include <msgimpl.h>
-#include <queueimpl.h>
+#include <mama/integration/subscription.h>
+#include <mama/integration/transport.h>
+#include <mama/integration/msg.h>
+#include <mama/integration/queue.h>
 #include <wombat/queue.h>
 #include "transport.h"
 #include "zmqdefs.h"
 #include "subscription.h"
-#include "endpointpool.h"
+#include <mama/integration/endpointpool.h>
 #include "zmqbridgefunctions.h"
 #include "msg.h"
 #include <zmq.h>

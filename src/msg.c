@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mama/mama.h>
-#include <msgimpl.h>
+#include <mama/integration/msg.h>
 #include "transport.h"
 #include "msg.h"
 
@@ -741,7 +741,7 @@ zmqBridgeMamaMsgImpl_deserialize (msgBridge        msg,
 
     mama_status status = mamaMsgImpl_setMsgBuffer (target,
                                                    (void*) bufferPos,
-                                                   payloadSize,
+                                                   (uint32_t)payloadSize,
                                                    *bufferPos);
 
     return status;

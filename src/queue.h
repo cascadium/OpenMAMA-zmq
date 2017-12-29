@@ -31,6 +31,7 @@
   =========================================================================*/
 
 #include "zmqdefs.h"
+#include <mama/integration/queue.h>
 
 
 #if defined(__cplusplus)

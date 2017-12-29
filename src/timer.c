@@ -143,7 +143,7 @@ zmqBridgeMamaTimer_create (timerBridge*  result,
 
     /* Determine when the next timer should fire */
     timeout.tv_sec  = (time_t) interval;
-    timeout.tv_usec = ((interval-timeout.tv_sec) * 1000000.0);
+    timeout.tv_usec = (long)((interval-timeout.tv_sec) * 1000000.0);
 
     /* Create the first single fire timer */
     timerResult = createTimer (&impl->mTimerElement,
@@ -217,7 +217,7 @@ zmqBridgeMamaTimer_reset (timerBridge timer)
 
     /* Calculate next time interval */
     timeout.tv_sec  = (time_t) impl->mInterval;
-    timeout.tv_usec = ((impl->mInterval- timeout.tv_sec) * 1000000.0);
+    timeout.tv_usec = (long)((impl->mInterval- timeout.tv_sec) * 1000000.0);
 
     /* Create the timer for the next firing */
     timerResult = createTimer (&impl->mTimerElement,

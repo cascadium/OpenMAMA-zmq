@@ -10,14 +10,9 @@ else()
     endif()
 
     # Note path is relative to where it would be used
-    set(DEFAULT_MAMA_SRC ../../OpenMAMA)
     set(DEFAULT_MAMA_ROOT "${DEFAULT_INSTALL_PREFIX}/OpenMAMA")
     set(DEFAULT_ZMQ_ROOT "${DEFAULT_INSTALL_PREFIX}/ZeroMQ 4.0.4")
     set(DEFAULT_EVENT_ROOT "${DEFAULT_INSTALL_PREFIX}/libevent")
-endif()
-
-if(NOT MAMA_SRC)
-    set(MAMA_SRC ${DEFAULT_MAMA_SRC})
 endif()
 
 if(NOT MAMA_ROOT)

@@ -35,7 +35,8 @@
 #include <list.h>
 #include <wombat/queue.h>
 #include <wombat/mempool.h>
-#include "endpointpool.h"
+#include <mama/integration/endpointpool.h>
+#include <mama/integration/msg.h>
 #include "queue.h"
 
 #if defined(__cplusplus)

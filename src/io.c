@@ -26,6 +26,7 @@
   =                             Includes                                  =
   =========================================================================*/
 
+#include <stdint.h>
 #include <mama/mama.h>
 #include <mama/io.h>
 #include <wombat/port.h>

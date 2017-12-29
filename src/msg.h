@@ -30,8 +30,8 @@
   =                             Includes                                  =
   =========================================================================*/
 
-#include <bridge.h>
 #include "zmqdefs.h"
+#include <mama/integration/msg.h>
 
 
 #if defined(__cplusplus)

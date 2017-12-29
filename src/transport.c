@@ -26,12 +26,13 @@
   =                             Includes                                  =
   =========================================================================*/
 
+#include <stdint.h>
 #include <mama/mama.h>
-#include <queueimpl.h>
-#include <msgimpl.h>
-#include <queueimpl.h>
-#include <subscriptionimpl.h>
-#include <transportimpl.h>
+#include <mama/integration/mama.h>
+#include <mama/integration/queue.h>
+#include <mama/integration/msg.h>
+#include <mama/integration/subscription.h>
+#include <mama/integration/transport.h>
 #include <timers.h>
 #include <stdio.h>
 #include <errno.h>
@@ -39,7 +40,7 @@
 #include "transport.h"
 #include "zmqdefs.h"
 #include "msg.h"
-#include "endpointpool.h"
+#include "mama/integration/endpointpool.h"
 #include "zmqbridgefunctions.h"
 #include <zmq.h>
 #include <errno.h>
@@ -317,7 +318,7 @@ zmqBridgeMamaTransport_create (transportBridge*    result,
     impl->mName                 = name;
 
     mama_log (MAMA_LOG_LEVEL_FINE,
-              "zmqBridgeMamaTransport_create(): Initializing Transport %s",
+              "zmqBridgeMamaTransport_create(): Initializing Transportttt %s",
               name);
 
     impl->mMemoryPoolSize = atol(zmqBridgeMamaTransportImpl_getParameter (
@@ -326,7 +327,9 @@ zmqBridgeMamaTransport_create (transportBridge*    result,
             TPORT_PARAM_PREFIX,
             name,
             TPORT_PARAM_MSG_POOL_SIZE));
-
+	mama_log(MAMA_LOG_LEVEL_FINE,
+		"zmqBridgeMamaTransport_create():creating endpoint A %s",
+		name);
     impl->mMemoryNodeSize = atol(zmqBridgeMamaTransportImpl_getParameter (
             DEFAULT_MEMNODE_SIZE,
             "%s.%s.%s",
@@ -395,7 +398,9 @@ zmqBridgeMamaTransport_create (transportBridge*    result,
         impl->mOutgoingAddress[uri_index] = uri;
         uri_index++;
     }
-
+	mama_log(MAMA_LOG_LEVEL_FINE,
+		"zmqBridgeMamaTransport_create():creating endpoint 1 %s",
+		name);
     status = endpointPool_create (&impl->mSubEndpoints, "mSubEndpoints");
     if (MAMA_STATUS_OK != status)
     {
@@ -405,7 +410,9 @@ zmqBridgeMamaTransport_create (transportBridge*    result,
         free (impl);
         return MAMA_STATUS_PLATFORM;
     }
-
+	mama_log(MAMA_LOG_LEVEL_FINE,
+		"zmqBridgeMamaTransport_create(): Creating endpoint 2 %s",
+		name);
     status = endpointPool_create (&impl->mPubEndpoints, "mPubEndpoints");
     if (MAMA_STATUS_OK != status)
     {
@@ -745,7 +752,6 @@ zmqBridgeMamaTransportImpl_setupSocket (void* socket, const char* uri, zmqTransp
                       uri,
                       strerror(errno));
         }
-        return rc;
     }
     else
     {
@@ -757,9 +763,9 @@ zmqBridgeMamaTransportImpl_setupSocket (void* socket, const char* uri, zmqTransp
                       rc,
                       uri,
                       strerror(errno));
-            return rc;
         }
     }
+    return rc;
 }
 
 mama_status
@@ -895,7 +901,7 @@ zmqBridgeMamaTransportImpl_queueCallback (mamaQueue queue, void* closure)
     memoryPool*           pool            = NULL;
     memoryNode*           node            = (memoryNode*) closure;
     zmqTransportMsg*      tmsg            = (zmqTransportMsg*) node->mNodeBuffer;
-    uint32_t              bufferSize      = tmsg->mNodeSize;
+    uint32_t              bufferSize      = (uint32_t)tmsg->mNodeSize;
     const void*           buffer          = tmsg->mNodeBuffer;
     const char*           subject         = (char*)buffer;
     zmqSubscription*      subscription    = (zmqSubscription*) tmsg->mSubscription;
@@ -994,15 +1000,20 @@ const char* zmqBridgeMamaTransportImpl_getParameterWithVaList (
     vsnprintf (paramName, PARAM_NAME_MAX_LENGTH,
                format, arguments);
 
+	mama_log(MAMA_LOG_LEVEL_FINER, "GETTING PARAMETER %s", paramName);
+	mamaInternal_getProperties();
+	mama_log(MAMA_LOG_LEVEL_FINER, "CAN GET PROPERTIES");
     /* Get the property out for analysis */
     property = properties_Get (mamaInternal_getProperties (),
                                paramName);
-
+	mama_log(MAMA_LOG_LEVEL_FINER, "GOT PROPERTY");
     /* Properties will return NULL if parameter is not specified in configs */
     if (property == NULL)
     {
         property = defaultVal;
     }
+
+	mama_log(MAMA_LOG_LEVEL_FINER, "RETURNING", property);
 
     return property;
 }

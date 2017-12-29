@@ -31,7 +31,7 @@
 #include <wombat/wUuid.h>
 #include <wombat/port.h>
 #include "zmqdefs.h"
-#include "inbox.h"
+#include <mama/integration/inbox.h>
 #include "zmqbridgefunctions.h"
 
 

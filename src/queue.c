@@ -28,8 +28,7 @@
 
 #include <mama/mama.h>
 #include <wombat/queue.h>
-#include <bridge.h>
-#include "queueimpl.h"
+#include <mama/integration/queue.h>
 #include "zmqbridgefunctions.h"
 #include "zmqdefs.h"
 
