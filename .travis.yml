@@ -28,7 +28,7 @@ before_install:
   - scons product=mama middleware=qpid with_unittest=y gtest_home=/usr/local
   - export MAMA_SOURCE=$(pwd)
   - export MAMA_INSTALL=$MAMA_SOURCE/$(ls -1 | grep "openmama_install_*")
-  - export WOMBAT_PATH=$MAMA_SOURCE/OpenMAMA/mama/c_cpp/src/examples:$MAMA_SOURCE/OpenMAMA/mama/c_cpp/src/gunittest/c:$SOURCE_DIR/config
+  - export WOMBAT_PATH=$MAMA_SOURCE/mama/c_cpp/src/examples:$MAMA_SOURCE/mama/c_cpp/src/gunittest/c:$SOURCE_DIR/config
   - export PATH=$MAMA_INSTALL/bin:$PATH
   - export LD_LIBRARY_PATH=$MAMA_INSTALL/lib
 
