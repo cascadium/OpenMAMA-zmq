@@ -59,7 +59,6 @@ if(WIN32)
     install(TARGETS mamazmqimpl${MAMA_LIB_SUFFIX}
             CONFIGURATIONS Debug
             DESTINATION bin/dynamic-debug)
-
 elseif(UNIX)
     target_link_libraries(mamazmqimpl${MAMA_LIB_SUFFIX}
                           wombatcommon
