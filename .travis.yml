@@ -21,9 +21,8 @@ before_install:
   - cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSYSINSTALL_BINDINGS=ON -DBUILD_JAVA=OFF -DBUILD_PERL=OFF -DBUILD_PHP=OFF -DBUILD_PYTHON=OFF -DBUILD_RUBY=OFF
   - sudo make install
   - cd
-  - git clone https://github.com/fquinner/OpenMAMA.git
+  - git clone https://github.com/OpenMAMA/OpenMAMA.git
   - cd OpenMAMA
-  - git checkout feature-bridge-public-headers
   - "cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo mv libg* /usr/local/lib/ ; cd -"
   - scons product=mama middleware=qpid with_unittest=y gtest_home=/usr/local
   - export MAMA_SOURCE=$(pwd)
