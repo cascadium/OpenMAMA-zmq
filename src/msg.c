@@ -136,12 +136,16 @@ zmqBridgeMamaMsg_isFromInbox (msgBridge msg)
 mama_status
 zmqBridgeMamaMsg_destroy (msgBridge msg, int destroyMsg)
 {
-    if (NULL == msg)
+    zmqBridgeMsgImpl*  impl        = (zmqBridgeMsgImpl*) msg;
+    if (NULL == impl)
     {
         return MAMA_STATUS_NULL_ARG;
     }
+    /* Destroy the reusable buffer */
+    free (impl->mSerializedBuffer);
+
     /* Free the underlying implementation */
-    free (msg);
+    free (impl);
 
     return MAMA_STATUS_OK;
 }

@@ -1000,20 +1000,14 @@ const char* zmqBridgeMamaTransportImpl_getParameterWithVaList (
     vsnprintf (paramName, PARAM_NAME_MAX_LENGTH,
                format, arguments);
 
-	mama_log(MAMA_LOG_LEVEL_FINER, "GETTING PARAMETER %s", paramName);
-	mamaInternal_getProperties();
-	mama_log(MAMA_LOG_LEVEL_FINER, "CAN GET PROPERTIES");
     /* Get the property out for analysis */
     property = properties_Get (mamaInternal_getProperties (),
                                paramName);
-	mama_log(MAMA_LOG_LEVEL_FINER, "GOT PROPERTY");
     /* Properties will return NULL if parameter is not specified in configs */
     if (property == NULL)
     {
         property = defaultVal;
     }
-
-	mama_log(MAMA_LOG_LEVEL_FINER, "RETURNING", property);
 
     return property;
 }
