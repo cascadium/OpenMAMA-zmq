@@ -52,6 +52,10 @@ zmqBridgeMamaSubscriptionImpl_generateSubjectKey (const char*  root,
                                                   const char*  topic,
                                                   char**       keyTarget);
 
+
+mama_status
+zmqBridgeMamaSubscriptionImpl_deactivate (subscriptionBridge subscriber);
+
 #if defined(__cplusplus)
 }
 #endif

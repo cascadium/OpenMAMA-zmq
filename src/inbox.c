@@ -33,6 +33,9 @@
 #include "zmqdefs.h"
 #include <mama/integration/inbox.h>
 #include "zmqbridgefunctions.h"
+#include "subscription.h"
+#include "inbox.h"
+#include "msg.h"
 
 extern subscriptionBridge
 mamaSubscription_getSubscriptionBridge(

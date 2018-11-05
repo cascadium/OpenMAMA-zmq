@@ -229,6 +229,10 @@ zmqBridgeMamaMsgImpl_deserialize             (msgBridge        msg,
                                               const void*      source,
                                               mama_size_t      size,
                                               mamaMsg          target);
+
+mama_status zmqBridgeMamaMsgImpl_getInboxName (msgBridge   msg,
+                                               char**      value);
+
 #if defined(__cplusplus)
 }
 #endif
