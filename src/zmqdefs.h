@@ -53,6 +53,17 @@ extern "C" {
 #define     ZMQ_MAX_INCOMING_URIS           64
 #define     ZMQ_MAX_OUTGOING_URIS           64
 
+#define     ZMQ_MSG_PROPERTY_LEN     1024
+
+
+typedef struct zmqBridgeMsgReplyHandle
+{
+    char                        mInboxName[ZMQ_MSG_PROPERTY_LEN];
+    char                        mReplyTo[ZMQ_MSG_PROPERTY_LEN];
+} zmqBridgeMsgReplyHandle;
+
+
+
 /* Message types */
 typedef enum zmqMsgType_
 {
@@ -90,7 +101,7 @@ typedef struct zmqTransportBridge_
     void*                   mZmqContext;
     void*                   mZmqSocketSubscriber;
     void*                   mZmqSocketPublisher;
-    void*                   mZmqSocketDispatcher;
+    //void*                   mZmqSocketDispatcher;
     const char*             mIncomingAddress[ZMQ_MAX_INCOMING_URIS];
     const char*             mOutgoingAddress[ZMQ_MAX_OUTGOING_URIS];
     const char*             mName;
@@ -124,7 +135,8 @@ typedef struct zmqTransportMsg_
 {
     size_t                  mNodeSize;
     size_t                  mNodeCapacity;
-    zmqSubscription*        mSubscription;
+    endpointPool_t          mSubEndpoints;
+    char*                   mEndpointIdentifier;
     uint8_t*                mNodeBuffer;
 } zmqTransportMsg;
 

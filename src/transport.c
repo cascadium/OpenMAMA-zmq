@@ -275,7 +275,7 @@ zmqBridgeMamaTransport_destroy (transportBridge transport)
 
     status = zmqBridgeMamaTransportImpl_stop (impl);
 
-    zmq_close (impl->mZmqSocketDispatcher);
+    //zmq_close (impl->mZmqSocketDispatcher);
     zmq_close (impl->mZmqSocketPublisher);
     zmq_close (impl->mZmqSocketSubscriber);
 
@@ -800,7 +800,7 @@ zmqBridgeMamaTransportImpl_start (zmqTransportBridge* impl)
     ZMQ_SET_SOCKET_OPTIONS (const char*,impl,IDENTITY,);
     ZMQ_SET_SOCKET_OPTIONS (int64_t,impl,MAXMSGSIZE,atoll);
 
-    for (i = 0; i < ZMQ_MAX_INCOMING_URIS; i++)
+    for (i = 0; i < ZMQ_MAX_OUTGOING_URIS; i++)
     {
         if (NULL == impl->mOutgoingAddress[i])
         {
@@ -821,7 +821,7 @@ zmqBridgeMamaTransportImpl_start (zmqTransportBridge* impl)
         }
     }
 
-    for (i = 0; i < ZMQ_MAX_OUTGOING_URIS; i++)
+    for (i = 0; i < ZMQ_MAX_INCOMING_URIS; i++)
     {
         if (NULL == impl->mIncomingAddress[i])
         {
@@ -862,7 +862,7 @@ zmqBridgeMamaTransportImpl_start (zmqTransportBridge* impl)
 mama_status zmqBridgeMamaTransportImpl_stop (zmqTransportBridge* impl)
 {
     /* There are two mechanisms by which we can stop the transport
-     * - Send a special message, which will be picked up by recv 
+     * - Send a special message, which will be picked up by recv
      *   For the instance when there is very little data flowing.
      * - Set the mIsDispatching variable in the transportBridge object to
      *   false, for instances when there is a lot of data flowing.
@@ -904,36 +904,32 @@ zmqBridgeMamaTransportImpl_queueCallback (mamaQueue queue, void* closure)
     uint32_t              bufferSize      = (uint32_t)tmsg->mNodeSize;
     const void*           buffer          = tmsg->mNodeBuffer;
     const char*           subject         = (char*)buffer;
-    zmqSubscription*      subscription    = (zmqSubscription*) tmsg->mSubscription;
-    zmqTransportBridge*   impl            = subscription->mTransport;
     zmqQueueBridge*       queueImpl       = NULL;
+
+
+    // find the subscription based on its identifier
+    zmqSubscription* subscription = NULL;
+    endpointPool_getEndpointByIdentifiers(tmsg->mSubEndpoints, subject,
+        tmsg->mEndpointIdentifier, (endpoint_t*) &subscription);
 
     /* Can't do anything without a subscriber */
     if (NULL == subscription)
     {
-        mama_log (MAMA_LOG_LEVEL_ERROR,
+        mama_log (MAMA_LOG_LEVEL_WARN,
                   "zmqBridgeMamaTransportImpl_queueCallback(): "
-                  "Called with NULL subscriber (destroyed?)");
-        return;
+                  "No endpoint found for topic %s with id %s", subject, tmsg->mEndpointIdentifier);
+        goto exit;
     }
 
-    if (0 == endpointPool_isRegistedByContent (impl->mSubEndpoints,
-                                               subject,
-                                               subscription))
-    {
-        mama_log (MAMA_LOG_LEVEL_ERROR,
-                  "zmqBridgeMamaTransportImpl_queueCallback(): "
-                  "Subscriber has been unregistered since msg was enqueued.");
-        return;
-    }
-
+    // It *appears* that the subscription is valid even after its mTransport member is set to NULL,
+    // so do this test first to avoid a SEGV dereferencing impl->mSubEndpoints below
     /* Make sure that the subscription is processing messages */
     if (1 != subscription->mIsNotMuted)
     {
-        mama_log (MAMA_LOG_LEVEL_ERROR,
+        mama_log (MAMA_LOG_LEVEL_WARN,
                   "zmqBridgeMamaTransportImpl_queueCallback(): "
                   "Skipping update - subscription %p is muted.", subscription);
-        return;
+        goto exit;
     }
 
     /* This is the reuseable message stored on the associated MamaQueue */
@@ -943,7 +939,7 @@ zmqBridgeMamaTransportImpl_queueCallback (mamaQueue queue, void* closure)
         mama_log (MAMA_LOG_LEVEL_ERROR,
                   "zmqBridgeMamaTransportImpl_queueCallback(): "
                   "Could not get cached mamaMsg from event queue.");
-        return;
+        goto exit;
     }
 
     /* Get the bridge message from the mamaMsg */
@@ -954,7 +950,7 @@ zmqBridgeMamaTransportImpl_queueCallback (mamaQueue queue, void* closure)
                   "zmqBridgeMamaTransportImpl_queueCallback(): "
                   "Could not get bridge message from cached "
                   "queue mamaMsg [%s]", mamaStatus_stringForStatus (status));
-        return;
+        goto exit;
     }
 
     /* Unpack this bridge message into a MAMA msg implementation */
@@ -979,9 +975,11 @@ zmqBridgeMamaTransportImpl_queueCallback (mamaQueue queue, void* closure)
         }
     }
 
-    mamaQueue_getNativeHandle (queue, (void**)&queueImpl);
+exit:
+   free(tmsg->mEndpointIdentifier);
 
-    // Return the memory node to the pool
+    // Return the memory node (allocated in zmqBridgeMamaTransportImpl_dispatchThread) to the pool
+    mamaQueue_getNativeHandle (queue, (void**)&queueImpl);
     pool = (memoryPool*) zmqBridgeMamaQueueImpl_getClosure ((queueBridge) queueImpl);
     memoryPool_returnNode (pool, node);
 
@@ -1067,7 +1065,7 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
     /*
      * Check if we should be still dispatching.
      * We shouldn't need to lock around this, as we're performing a simple value
-     * read - if it changes in the middle of the read, we don't actually care. 
+     * read - if it changes in the middle of the read, we don't actually care.
      */
     zmq_msg_t zmsg;
     zmq_msg_init (&zmsg);
@@ -1082,6 +1080,8 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
 
         // We just received a message if we got this far
         subject = (char*) zmq_msg_data (&zmsg);
+
+        mama_log (MAMA_LOG_LEVEL_FINE, "zmqBridgeMamaTransportImpl_dispatchThread: Got msg with subject %s", subject);
 
         status = endpointPool_getRegistered (impl->mSubEndpoints,
                                              subject,
@@ -1102,7 +1102,7 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
 
         if (0 == subCount)
         {
-            mama_log (MAMA_LOG_LEVEL_FINEST,
+            mama_log (MAMA_LOG_LEVEL_WARN,
                       "zmqBridgeMamaTransportImpl_dispatchThread(): "
                       "discarding uninteresting message "
                       "for symbol %s", subject);
@@ -1112,12 +1112,8 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
 
         for (subInc = 0; subInc < subCount; subInc++)
         {
-            queueBridge      queueImpl = NULL;
-            memoryPool*      pool      = NULL;
-            memoryNode*      node      = NULL;
-            zmqTransportMsg* tmsg      = NULL;
-
             subscription = (zmqSubscription*)subs[subInc];
+
             if (1 == subscription->mIsTportDisconnected)
             {
                 subscription->mIsTportDisconnected = 0;
@@ -1125,17 +1121,17 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
 
             if (1 != subscription->mIsNotMuted)
             {
-                mama_log (MAMA_LOG_LEVEL_FINEST,
+                mama_log (MAMA_LOG_LEVEL_WARN,
                           "zmqBridgeMamaTransportImpl_dispatchThread(): "
                           "muted - not queueing update for symbol %s",
                           subject);
                 continue;
             }
 
-            queueImpl = (queueBridge) subscription->mZmqQueue;
+            queueBridge queueImpl = (queueBridge) subscription->mZmqQueue;
 
             /* Get the memory pool from the queue, creating if necessary */
-            pool = (memoryPool*) zmqBridgeMamaQueueImpl_getClosure (queueImpl);
+            memoryPool* pool = (memoryPool*) zmqBridgeMamaQueueImpl_getClosure (queueImpl);
             if (NULL == pool)
             {
                 pool = memoryPool_create (impl->mMemoryPoolSize, impl->mMemoryNodeSize);
@@ -1143,12 +1139,15 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
                         zmqBridgeMamaTransportImpl_queueClosureCleanupCb);
             }
 
+            // TODO: can/should move following to zmqBridgeMamaTransportImpl_queueCallback?
             // allocate/populate zmqTransportMsg
-            node = memoryPool_getNode (pool, sizeof(zmqTransportMsg) + zmq_msg_size(&zmsg));
-            tmsg = (zmqTransportMsg*) node->mNodeBuffer;
+            memoryNode* node = memoryPool_getNode (pool, sizeof(zmqTransportMsg) + zmq_msg_size(&zmsg));
+            zmqTransportMsg* tmsg = (zmqTransportMsg*) node->mNodeBuffer;
             tmsg->mNodeBuffer   = (uint8_t*)(tmsg + 1);
             tmsg->mNodeSize     = zmq_msg_size(&zmsg);
-            tmsg->mSubscription = subscription;
+            //tmsg->mSubscription = subscription;
+            tmsg->mSubEndpoints = impl->mSubEndpoints;
+            tmsg->mEndpointIdentifier = strdup(subscription->mEndpointIdentifier);
             memcpy (tmsg->mNodeBuffer, zmq_msg_data(&zmsg),tmsg->mNodeSize);
 
             // callback (queued) will release the message
