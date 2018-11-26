@@ -37,7 +37,6 @@
 #include <wombat/mempool.h>
 #include <mama/integration/endpointpool.h>
 #include <mama/integration/msg.h>
-#include "queue.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -139,7 +138,6 @@ typedef struct zmqQueueBridge {
     mamaQueueEnqueueCB      mEnqueueCallback;
     void*                   mClosure;
     wthread_mutex_t         mDispatchLock;
-    zmqQueueClosureCleanup  mClosureCleanupCb;
     void*                   mZmqContext;
     void*                   mZmqSocketWorker;
     void*                   mZmqSocketDealer;

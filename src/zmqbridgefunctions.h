@@ -43,22 +43,6 @@ extern mama_status
 zmqBridge_init (mamaBridge bridgeImpl);
 
 MAMAExpBridgeDLL
-extern mama_status
-zmqBridge_open (mamaBridge bridgeImpl);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridge_close (mamaBridge bridgeImpl);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridge_start (mamaQueue defaultEventQueue);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridge_stop (mamaQueue defaultEventQueue);
-
-MAMAExpBridgeDLL
 extern const char*
 zmqBridge_getVersion (void);
 
@@ -69,70 +53,6 @@ zmqBridge_getName (void);
 MAMAExpBridgeDLL
 extern mama_status
 zmqBridge_getDefaultPayloadId (char*** name, char** id);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_create (queueBridge *queue, mamaQueue parent);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_create_usingNative (queueBridge *queue, mamaQueue parent,
-                                       void* nativeQueue);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_destroy (queueBridge queue);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_getEventCount (queueBridge queue, size_t* count);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_dispatch (queueBridge queue);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_timedDispatch (queueBridge queue, uint64_t timeout);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_dispatchEvent (queueBridge queue);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_enqueueEvent (queueBridge        queue,
-                                 mamaQueueEnqueueCB callback,
-                                 void*              closure);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_stopDispatch (queueBridge queue);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_setEnqueueCallback (queueBridge        queue,
-                                       mamaQueueEnqueueCB callback,
-                                       void*              closure);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_removeEnqueueCallback (queueBridge queue);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_getNativeHandle (queueBridge queue,
-                                    void**      nativeHandle);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_setHighWatermark (queueBridge queue,
-                                     size_t      highWatermark);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaQueue_setLowWatermark (queueBridge queue,
-                                    size_t      lowWatermark);
 
 MAMAExpBridgeDLL
 extern int
@@ -333,50 +253,6 @@ zmqBridgeMamaSubscription_setTopicClosure (subscriptionBridge subsc,
 MAMAExpBridgeDLL
 extern mama_status
 zmqBridgeMamaSubscription_muteCurrentTopic (subscriptionBridge subsc);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTimer_create (timerBridge* timer,
-                           void*        nativeQueueHandle,
-                           mamaTimerCb  action,
-                           mamaTimerCb  onTimerDestroyed,
-                           mama_f64_t   interval,
-                           mamaTimer    parent,
-                           void*        closure);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTimer_destroy (timerBridge timer);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTimer_reset (timerBridge timer);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTimer_setInterval (timerBridge timer, mama_f64_t interval);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTimer_getInterval (timerBridge timer, mama_f64_t* interval);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaIo_create (ioBridge*       result,
-                        void*           nativeQueueHandle,
-                        uint32_t        descriptor,
-                        mamaIoCb        action,
-                        mamaIoType      ioType,
-                        mamaIo          parent,
-                        void*           closure);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaIo_getDescriptor (ioBridge io, uint32_t* result);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaIo_destroy (ioBridge io);
 
 MAMAExpBridgeDLL
 extern mama_status

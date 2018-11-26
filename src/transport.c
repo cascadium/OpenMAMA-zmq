@@ -40,7 +40,8 @@
 #include "transport.h"
 #include "zmqdefs.h"
 #include "msg.h"
-#include "mama/integration/endpointpool.h"
+#include <mama/integration/endpointpool.h>
+#include <mama/integration/bridge/base.h>
 #include "zmqbridgefunctions.h"
 #include <zmq.h>
 #include <errno.h>
@@ -982,7 +983,7 @@ zmqBridgeMamaTransportImpl_queueCallback (mamaQueue queue, void* closure)
     mamaQueue_getNativeHandle (queue, (void**)&queueImpl);
 
     // Return the memory node to the pool
-    pool = (memoryPool*) zmqBridgeMamaQueueImpl_getClosure ((queueBridge) queueImpl);
+    pool = (memoryPool*) baseBridgeMamaQueueImpl_getClosure ((queueBridge) queueImpl);
     memoryPool_returnNode (pool, node);
 
     return;
@@ -1135,11 +1136,11 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
             queueImpl = (queueBridge) subscription->mZmqQueue;
 
             /* Get the memory pool from the queue, creating if necessary */
-            pool = (memoryPool*) zmqBridgeMamaQueueImpl_getClosure (queueImpl);
+            pool = (memoryPool*) baseBridgeMamaQueueImpl_getClosure (queueImpl);
             if (NULL == pool)
             {
                 pool = memoryPool_create (impl->mMemoryPoolSize, impl->mMemoryNodeSize);
-                zmqBridgeMamaQueueImpl_setClosure (queueImpl, pool,
+                baseBridgeMamaQueueImpl_setClosure (queueImpl, pool,
                         zmqBridgeMamaTransportImpl_queueClosureCleanupCb);
             }
 
@@ -1152,7 +1153,7 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
             memcpy (tmsg->mNodeBuffer, zmq_msg_data(&zmsg),tmsg->mNodeSize);
 
             // callback (queued) will release the message
-            zmqBridgeMamaQueue_enqueueEvent ((queueBridge) queueImpl,
+            baseBridgeMamaQueue_enqueueEvent ((queueBridge) queueImpl,
                     zmqBridgeMamaTransportImpl_queueCallback, node);
         }
     }

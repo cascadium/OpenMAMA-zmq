@@ -25,16 +25,11 @@ add_library(mamazmqimpl${MAMA_LIB_SUFFIX}
             MODULE bridge.c
                    inbox.c
                    inbox.h
-                   io.c
-                   io.h
                    msg.c
                    msg.h
                    publisher.c
-                   queue.c
-                   queue.h
                    subscription.c
                    subscription.h
-                   timer.c
                    transport.c
                    transport.h
                    zmqbridgefunctions.h
@@ -61,6 +56,7 @@ if(WIN32)
             DESTINATION bin/dynamic-debug)
 elseif(UNIX)
     target_link_libraries(mamazmqimpl${MAMA_LIB_SUFFIX}
+                          mamabaseimpl${MAMA_LIB_SUFFIX}
                           wombatcommon
                           mama
                           zmq
