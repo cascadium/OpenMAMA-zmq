@@ -23,8 +23,6 @@ endif()
 
 add_library(mamazmqimpl${MAMA_LIB_SUFFIX}
             MODULE bridge.c
-                   inbox.c
-                   inbox.h
                    msg.c
                    msg.h
                    publisher.c

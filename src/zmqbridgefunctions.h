@@ -69,135 +69,6 @@ zmqBridgeMamaTransport_create (transportBridge* result,
                                mamaTransport    parent);
 
 MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_forceClientDisconnect (
-                               transportBridge* transports,
-                               int              numTransports,
-                               const char*      ipAddress,
-                               uint16_t         port);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_findConnection (transportBridge* transports,
-                                       int              numTransports,
-                                       mamaConnection*  result,
-                                       const char*      ipAddress,
-                                       uint16_t         port);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_getAllConnections (transportBridge* transports,
-                                          int              numTransports,
-                                          mamaConnection** result,
-                                          uint32_t*        len);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_getAllConnectionsForTopic (transportBridge* transports,
-                                                  int              numTransports,
-                                                  const char*      topic,
-                                                  mamaConnection** result,
-                                                  uint32_t*        len);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_requestConflation (transportBridge* transports,
-                                          int              numTransports);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_requestEndConflation (transportBridge* transports,
-                                             int              numTransports);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_getAllServerConnections (
-                               transportBridge*       transports,
-                               int                    numTransports,
-                               mamaServerConnection** result,
-                               uint32_t*              len);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_freeAllServerConnections (
-                               transportBridge*        transports,
-                               int                     numTransports,
-                               mamaServerConnection*   connections,
-                               uint32_t                len);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_freeAllConnections (transportBridge* transports,
-                                           int              numTransports,
-                                           mamaConnection*  connections,
-                                           uint32_t         len);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_getNumLoadBalanceAttributes (
-                               const char* name,
-                               int*        numLoadBalanceAttributes);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_getLoadBalanceSharedObjectName (
-                               const char*  name,
-                               const char** loadBalanceSharedObjectName);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_getLoadBalanceScheme (
-                               const char*    name,
-                               tportLbScheme* scheme);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_sendMsgToConnection (
-                               transportBridge transport,
-                               mamaConnection  connection,
-                               mamaMsg         msg,
-                               const char*     topic);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_isConnectionIntercepted (
-                               mamaConnection connection,
-                               uint8_t* result);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_installConnectConflateMgr (
-                               transportBridge       transport,
-                               mamaConflationManager mgr,
-                               mamaConnection        connection,
-                               conflateProcessCb     processCb,
-                               conflateGetMsgCb      msgCb);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_uninstallConnectConflateMgr (
-                               transportBridge       transport,
-                               mamaConflationManager mgr,
-                               mamaConnection        connection);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_startConnectionConflation (
-                               transportBridge        transport,
-                               mamaConflationManager  mgr,
-                               mamaConnection         connection);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_getNativeTransport (transportBridge transport,
-                                           void**          result);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaTransport_getNativeTransportNamingCtx (transportBridge transport,
-                                                    void**          result);
-
-MAMAExpBridgeDLL
 extern mama_status zmqBridgeMamaSubscription_create
                               (subscriptionBridge* subscriber,
                                const char*         source,
@@ -234,21 +105,7 @@ zmqBridgeMamaSubscription_isValid (subscriptionBridge bridge);
 
 MAMAExpBridgeDLL
 extern int
-zmqBridgeMamaSubscription_hasWildcards (subscriptionBridge subscriber);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaSubscription_getPlatformError (subscriptionBridge subsc,
-                                            void** error);
-
-MAMAExpBridgeDLL
-extern int
 zmqBridgeMamaSubscription_isTportDisconnected (subscriptionBridge subsc);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaSubscription_setTopicClosure (subscriptionBridge subsc,
-                                           void* closure);
 
 MAMAExpBridgeDLL
 extern mama_status
@@ -294,45 +151,10 @@ zmqBridgeMamaPublisher_sendFromInboxByIndex (publisherBridge   publisher,
 
 MAMAExpBridgeDLL
 extern mama_status
-zmqBridgeMamaPublisher_sendFromInbox (publisherBridge publisher,
-                                      mamaInbox       inbox,
-                                      mamaMsg         msg);
-
-MAMAExpBridgeDLL
-extern mama_status
 zmqBridgeMamaPublisher_setUserCallbacks (publisherBridge         publisher,
                                          mamaQueue               queue,
                                          mamaPublisherCallbacks* cb,
                                          void*                   closure);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaInbox_create (
-            inboxBridge*                bridge,
-            mamaTransport               tport,
-            mamaQueue                   queue,
-            mamaInboxMsgCallback        msgCB,
-            mamaInboxErrorCallback      errorCB,
-            mamaInboxDestroyCallback    onInboxDestroyed,
-            void*                       closure,
-            mamaInbox                   parent);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaInbox_createByIndex (
-            inboxBridge*                bridge,
-            mamaTransport               tport,
-            int                         tportIndex,
-            mamaQueue                   queue,
-            mamaInboxMsgCallback        msgCB,
-            mamaInboxErrorCallback      errorCB,
-            mamaInboxDestroyCallback    onInboxDestroyed,
-            void*                       closure,
-            mamaInbox                   parent);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaInbox_destroy (inboxBridge inbox);
 
 MAMAExpBridgeDLL
 extern mama_status

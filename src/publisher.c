@@ -37,7 +37,7 @@
 #include "transport.h"
 #include "zmqdefs.h"
 #include "msg.h"
-#include "inbox.h"
+#include "mama/integration/bridge/base.h"
 #include "subscription.h"
 #include "mama/integration/endpointpool.h"
 #include "zmqbridgefunctions.h"
@@ -474,7 +474,7 @@ zmqBridgeMamaPublisher_sendFromInboxByIndex (publisherBridge   publisher,
 
     /* Get the inbox which you want the publisher to respond to */
     inboxImpl = mamaInboxImpl_getInboxBridge (inbox);
-    replyAddr = zmqBridgeMamaInboxImpl_getReplySubject (inboxImpl);
+    replyAddr = baseBridgeMamaInboxImpl_getReplySubject (inboxImpl);
 
     /* Mark this as being a request from an inbox */
     status = zmqBridgeMamaMsgImpl_setMsgType (impl->mMamaBridgeMsg,
@@ -501,17 +501,6 @@ zmqBridgeMamaPublisher_sendFromInboxByIndex (publisherBridge   publisher,
     }
 
     return zmqBridgeMamaPublisher_send (publisher, msg);;
-}
-
-mama_status
-zmqBridgeMamaPublisher_sendFromInbox (publisherBridge  publisher,
-                                        mamaInbox        inbox,
-                                        mamaMsg          msg)
-{
-    return zmqBridgeMamaPublisher_sendFromInboxByIndex (publisher,
-                                                        0,
-                                                        inbox,
-                                                        msg);
 }
 
 mama_status

@@ -224,19 +224,6 @@ zmqBridgeMamaSubscription_isValid (subscriptionBridge subscriber)
 }
 
 int
-zmqBridgeMamaSubscription_hasWildcards (subscriptionBridge subscriber)
-{
-    return 0;
-}
-
-mama_status
-zmqBridgeMamaSubscription_getPlatformError (subscriptionBridge subscriber,
-                                            void** error)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-int
 zmqBridgeMamaSubscription_isTportDisconnected (subscriptionBridge subscriber)
 {
 	zmqSubscription* impl = (zmqSubscription*) subscriber;
@@ -245,13 +232,6 @@ zmqBridgeMamaSubscription_isTportDisconnected (subscriptionBridge subscriber)
 		return MAMA_STATUS_NULL_ARG;
 	}
     return impl->mIsTportDisconnected;
-}
-
-mama_status
-zmqBridgeMamaSubscription_setTopicClosure (subscriptionBridge subscriber,
-                                           void*              closure)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
 }
 
 mama_status
