@@ -23,7 +23,7 @@ before_install:
   - cd
   - git clone https://github.com/fquinner/OpenMAMA.git
   - cd OpenMAMA
-  - git checkout feature-bridge-public-headers
+  - git checkout feature/split-common-middleware-methods
   - "cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo mv libg* /usr/local/lib/ ; cd -"
   - scons product=mama middleware=qpid with_unittest=y gtest_home=/usr/local
   - export MAMA_SOURCE=$(pwd)
