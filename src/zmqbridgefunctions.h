@@ -156,60 +156,6 @@ zmqBridgeMamaPublisher_setUserCallbacks (publisherBridge         publisher,
                                          mamaPublisherCallbacks* cb,
                                          void*                   closure);
 
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsg_create (msgBridge* msg, mamaMsg parent);
-
-MAMAExpBridgeDLL
-extern int
-zmqBridgeMamaMsg_isFromInbox (msgBridge msg);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsg_destroy (msgBridge msg, int destroyMsg);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsg_destroyMiddlewareMsg (msgBridge msg);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsg_detach (msgBridge msg);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsg_getPlatformError (msgBridge msg, void** error);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsg_setSendSubject (msgBridge   msg,
-                                 const char* symbol,
-                                 const char* subject);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsg_getNativeHandle (msgBridge msg, void** result);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsg_duplicateReplyHandle (msgBridge msg, void** result);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsg_copyReplyHandle (void* src, void** dest);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsgImpl_setReplyHandle (msgBridge msg, void* handle);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsgImpl_setReplyHandleAndIncrement (msgBridge msg, void* handle);
-
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaMsg_destroyReplyHandle (void* handle);
-
 #if defined(__cplusplus)
 }
 #endif

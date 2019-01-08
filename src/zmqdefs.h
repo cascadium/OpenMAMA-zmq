@@ -52,15 +52,6 @@ extern "C" {
 #define     ZMQ_MAX_INCOMING_URIS           64
 #define     ZMQ_MAX_OUTGOING_URIS           64
 
-/* Message types */
-typedef enum zmqMsgType_
-{
-    ZMQ_MSG_PUB_SUB        =              0x00,
-    ZMQ_MSG_INBOX_REQUEST,
-    ZMQ_MSG_INBOX_RESPONSE,
-    ZMQ_MSG_SUB_REQUEST
-} zmqMsgType;
-
 typedef enum zmqTransportType_
 {
     ZMQ_TPORT_TYPE_TCP,

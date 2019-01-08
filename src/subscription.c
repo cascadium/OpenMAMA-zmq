@@ -39,9 +39,9 @@
 #include "subscription.h"
 #include <mama/integration/endpointpool.h>
 #include "zmqbridgefunctions.h"
-#include "msg.h"
 #include <zmq.h>
 #include <errno.h>
+#include <mama/integration/bridge/base.h>
 
 
 /*=========================================================================
@@ -110,8 +110,8 @@ zmqBridgeMamaSubscription_create (subscriptionBridge* subscriber,
                                             impl);
 
     /* Set the message meta data to reflect a subscription request */
-    zmqBridgeMamaMsgImpl_setMsgType (transport->mMsg,
-                                     ZMQ_MSG_SUB_REQUEST);
+    baseBridgeMamaMsgImpl_setMsgType (transport->mMsg,
+                                     BASE_MSG_SUB_REQUEST);
 
     /* subscribe to the topic */
     zmq_setsockopt (transport->mZmqSocketSubscriber,
