@@ -79,17 +79,6 @@ extern mama_status zmqBridgeMamaSubscription_create
                                mamaSubscription    subscription,
                                void*               closure );
 
-MAMAExpBridgeDLL
-extern mama_status
-zmqBridgeMamaSubscription_createWildCard (
-                               subscriptionBridge* subsc_,
-                               const char*         source,
-                               const char*         symbol,
-                               mamaTransport       transport,
-                               mamaQueue           queue,
-                               mamaMsgCallbacks    callback,
-                               mamaSubscription    subscription,
-                               void*               closure );
 
 MAMAExpBridgeDLL
 extern mama_status

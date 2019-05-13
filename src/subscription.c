@@ -133,19 +133,6 @@ zmqBridgeMamaSubscription_create (subscriptionBridge* subscriber,
 }
 
 mama_status
-zmqBridgeMamaSubscription_createWildCard (subscriptionBridge*     subscriber,
-                                          const char*             source,
-                                          const char*             symbol,
-                                          mamaTransport           transport,
-                                          mamaQueue               queue,
-                                          mamaMsgCallbacks        callback,
-                                          mamaSubscription        subscription,
-                                          void*                   closure)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
 zmqBridgeMamaSubscription_mute (subscriptionBridge subscriber)
 {
     zmqSubscription* impl = (zmqSubscription*) subscriber;
