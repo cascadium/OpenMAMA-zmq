@@ -39,9 +39,9 @@
 #include "subscription.h"
 #include <mama/integration/endpointpool.h>
 #include "zmqbridgefunctions.h"
-#include "msg.h"
 #include <zmq.h>
 #include <errno.h>
+#include <mama/integration/bridge/base.h>
 
 
 /*=========================================================================
@@ -110,8 +110,8 @@ zmqBridgeMamaSubscription_create (subscriptionBridge* subscriber,
                                             impl);
 
     /* Set the message meta data to reflect a subscription request */
-    zmqBridgeMamaMsgImpl_setMsgType (transport->mMsg,
-                                     ZMQ_MSG_SUB_REQUEST);
+    baseBridgeMamaMsgImpl_setMsgType (transport->mMsg,
+                                     BASE_MSG_SUB_REQUEST);
 
     /* subscribe to the topic */
     zmq_setsockopt (transport->mZmqSocketSubscriber,
@@ -130,19 +130,6 @@ zmqBridgeMamaSubscription_create (subscriptionBridge* subscriber,
     *subscriber =  (subscriptionBridge) impl;
 
     return MAMA_STATUS_OK;
-}
-
-mama_status
-zmqBridgeMamaSubscription_createWildCard (subscriptionBridge*     subscriber,
-                                          const char*             source,
-                                          const char*             symbol,
-                                          mamaTransport           transport,
-                                          mamaQueue               queue,
-                                          mamaMsgCallbacks        callback,
-                                          mamaSubscription        subscription,
-                                          void*                   closure)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
 }
 
 mama_status
@@ -224,19 +211,6 @@ zmqBridgeMamaSubscription_isValid (subscriptionBridge subscriber)
 }
 
 int
-zmqBridgeMamaSubscription_hasWildcards (subscriptionBridge subscriber)
-{
-    return 0;
-}
-
-mama_status
-zmqBridgeMamaSubscription_getPlatformError (subscriptionBridge subscriber,
-                                            void** error)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-int
 zmqBridgeMamaSubscription_isTportDisconnected (subscriptionBridge subscriber)
 {
 	zmqSubscription* impl = (zmqSubscription*) subscriber;
@@ -245,13 +219,6 @@ zmqBridgeMamaSubscription_isTportDisconnected (subscriptionBridge subscriber)
 		return MAMA_STATUS_NULL_ARG;
 	}
     return impl->mIsTportDisconnected;
-}
-
-mama_status
-zmqBridgeMamaSubscription_setTopicClosure (subscriptionBridge subscriber,
-                                           void*              closure)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
 }
 
 mama_status

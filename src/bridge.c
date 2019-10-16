@@ -29,17 +29,15 @@
 #include <stdint.h>
 #include <mama/mama.h>
 #include <timers.h>
-#include "io.h"
 #include "zmqbridgefunctions.h"
 #include <mama/integration/mama.h>
+#include <mama/integration/bridge.h>
+#include <wombat/strutils.h>
 
 
 /*=========================================================================
   =                Typedefs, structs, enums and globals                   =
   =========================================================================*/
-
-/* Global timer heap */
-timerHeap           gOmzmqTimerHeap;
 
 /* Default payload names and IDs to be loaded when this bridge is loaded */
 static char*        PAYLOAD_NAMES[]         =   { "qpidmsg", NULL };
@@ -50,152 +48,51 @@ static char         PAYLOAD_IDS[]           =   { MAMA_PAYLOAD_QPID, '\0' };
   =========================================================================*/
 
 /* Version identifiers */
-#define             ZMQ_BRIDGE_NAME            "zmq"
-#define             ZMQ_BRIDGE_VERSION         "1.0"
-
-/* Name to be given to the default queue. Should be bridge-specific. */
-#define             ZMQ_DEFAULT_QUEUE_NAME     "ZMQ_DEFAULT_MAMA_QUEUE"
-
-/* Timeout for dispatching queues on shutdown in milliseconds */
-#define             ZMQ_SHUTDOWN_TIMEOUT       5000
+#define             BRIDGE_NAME            "zmq"
+#define             BRIDGE_VERSION         "1.0"
 
 
 /*=========================================================================
   =               Public interface implementation functions               =
   =========================================================================*/
 
-mama_status zmqBridge_init (mamaBridge bridgeImpl)
+mama_status
+zmqBridge_init (mamaBridge bridgeImpl)
 {
-    MAMA_SET_BRIDGE_COMPILE_TIME_VERSION(ZMQ_BRIDGE_NAME);
+    mama_status status         = MAMA_STATUS_OK;
+    const char* runtimeVersion = NULL;
+
+    /* Reusable buffer to populate with property values */
+    char propString[MAX_INTERNAL_PROP_LEN];
+    versionInfo rtVer;
+
+    mama_log (MAMA_LOG_LEVEL_SEVERE, "noopBridge_init(): IN INIT");
+
+    /* Will set the bridge's compile time MAMA version */
+    MAMA_SET_BRIDGE_COMPILE_TIME_VERSION(BRIDGE_NAME);
+
+    /* Enable extending of the base bridge implementation */
+    status = mamaBridgeImpl_setReadOnlyProperty (bridgeImpl,
+                                                 MAMA_PROP_EXTENDS_BASE_BRIDGE,
+                                                 "true");
+
+    /* Get the runtime version of MAMA and parse into version struct */
+    runtimeVersion = mamaInternal_getMetaProperty (MAMA_PROP_MAMA_RUNTIME_VER);
+    strToVersionInfo (runtimeVersion, &rtVer);
 
     return MAMA_STATUS_OK;
-}
-
-mama_status
-zmqBridge_open (mamaBridge bridgeImpl)
-{
-    mama_status         status            = MAMA_STATUS_OK;
-    mamaQueue           defaultEventQueue = NULL;
-
-    wsocketstartup();
-
-    if (NULL == bridgeImpl)
-    {
-        return MAMA_STATUS_NULL_ARG;
-    }
-
-    /* Create the default event queue */
-    status = mamaQueue_create (&defaultEventQueue, bridgeImpl);
-    if (MAMA_STATUS_OK != status)
-    {
-        mama_log (MAMA_LOG_LEVEL_ERROR,
-                  "zmqBridge_open(): Failed to create zmq queue (%s).",
-                  mamaStatus_stringForStatus (status));
-        return status;
-    }
-
-    mamaImpl_setDefaultEventQueue(bridgeImpl, defaultEventQueue);
-
-    /* Set the queue name (used to identify this queue in MAMA stats) */
-    mamaQueue_setQueueName (defaultEventQueue, ZMQ_DEFAULT_QUEUE_NAME);
-
-    /* Create the timer heap */
-    if (0 != createTimerHeap (&gOmzmqTimerHeap))
-    {
-        mama_log (MAMA_LOG_LEVEL_ERROR,
-                  "zmqBridge_open(): Failed to initialize timers.");
-        return MAMA_STATUS_PLATFORM;
-    }
-
-    /* Start the dispatch timer heap which will create a new thread */
-    if (0 != startDispatchTimerHeap (gOmzmqTimerHeap))
-    {
-        mama_log (MAMA_LOG_LEVEL_ERROR,
-                  "zmqBridge_open(): Failed to start timer thread.");
-        return MAMA_STATUS_PLATFORM;
-    }
-
-    /* Start the io thread */
-    zmqBridgeMamaIoImpl_start ();
-
-    return MAMA_STATUS_OK;
-}
-
-mama_status
-zmqBridge_close (mamaBridge bridgeImpl)
-{
-    mama_status      status            = MAMA_STATUS_OK;
-    mamaQueue        defaultEventQueue = NULL;
-    wthread_t        timerThread;
-
-    if (NULL ==  bridgeImpl)
-    {
-        return MAMA_STATUS_NULL_ARG;
-    }
-
-    /* Remove the timer heap */
-    if (NULL != gOmzmqTimerHeap)
-    {
-        /* The timer heap allows us to access it's thread ID for joining */
-        timerThread = timerHeapGetTid (gOmzmqTimerHeap);
-        if (0 != destroyHeap (gOmzmqTimerHeap))
-        {
-            mama_log (MAMA_LOG_LEVEL_ERROR,
-                      "zmqBridge_close(): Failed to destroy zmq timer heap.");
-            status = MAMA_STATUS_PLATFORM;
-        }
-        /* The timer thread expects us to be responsible for terminating it */
-        wthread_join    (timerThread, NULL);
-    }
-    gOmzmqTimerHeap = NULL;
-
-    /* Destroy once queue has been emptied */
-    mama_getDefaultEventQueue(bridgeImpl, &defaultEventQueue);
-    mamaQueue_destroyTimedWait (defaultEventQueue, ZMQ_SHUTDOWN_TIMEOUT);
-
-    /* Stop and destroy the io thread */
-    zmqBridgeMamaIoImpl_stop ();
-
-    return status;
-}
-
-mama_status
-zmqBridge_start (mamaQueue defaultEventQueue)
-{
-    if (NULL == defaultEventQueue)
-    {
-      mama_log (MAMA_LOG_LEVEL_FINER,
-                "zmqBridge_start(): defaultEventQueue is NULL");
-      return MAMA_STATUS_NULL_ARG;
-    }
-
-    /* Start the default event queue */
-    return mamaQueue_dispatch (defaultEventQueue);;
-}
-
-mama_status
-zmqBridge_stop (mamaQueue defaultEventQueue)
-{
-    if (NULL == defaultEventQueue)
-    {
-      mama_log (MAMA_LOG_LEVEL_FINER,
-                "zmqBridge_start(): defaultEventQueue is NULL");
-      return MAMA_STATUS_NULL_ARG;
-    }
-
-    return mamaQueue_stopDispatch (defaultEventQueue);;
 }
 
 const char*
 zmqBridge_getVersion (void)
 {
-    return ZMQ_BRIDGE_VERSION;
+    return BRIDGE_VERSION;
 }
 
 const char*
 zmqBridge_getName (void)
 {
-    return ZMQ_BRIDGE_NAME;
+    return BRIDGE_NAME;
 }
 
 mama_status

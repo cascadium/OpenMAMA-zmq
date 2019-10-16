@@ -37,7 +37,6 @@
 #include <wombat/mempool.h>
 #include <mama/integration/endpointpool.h>
 #include <mama/integration/msg.h>
-#include "queue.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -52,15 +51,6 @@ extern "C" {
 #define     MAX_SUBJECT_LENGTH              256
 #define     ZMQ_MAX_INCOMING_URIS           64
 #define     ZMQ_MAX_OUTGOING_URIS           64
-
-/* Message types */
-typedef enum zmqMsgType_
-{
-    ZMQ_MSG_PUB_SUB        =              0x00,
-    ZMQ_MSG_INBOX_REQUEST,
-    ZMQ_MSG_INBOX_RESPONSE,
-    ZMQ_MSG_SUB_REQUEST
-} zmqMsgType;
 
 typedef enum zmqTransportType_
 {
@@ -139,7 +129,6 @@ typedef struct zmqQueueBridge {
     mamaQueueEnqueueCB      mEnqueueCallback;
     void*                   mClosure;
     wthread_mutex_t         mDispatchLock;
-    zmqQueueClosureCleanup  mClosureCleanupCb;
     void*                   mZmqContext;
     void*                   mZmqSocketWorker;
     void*                   mZmqSocketDealer;

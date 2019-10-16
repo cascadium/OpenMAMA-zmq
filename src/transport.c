@@ -40,7 +40,8 @@
 #include "transport.h"
 #include "zmqdefs.h"
 #include "msg.h"
-#include "mama/integration/endpointpool.h"
+#include <mama/integration/endpointpool.h>
+#include <mama/integration/bridge/base.h>
 #include "zmqbridgefunctions.h"
 #include <zmq.h>
 #include <errno.h>
@@ -430,202 +431,6 @@ zmqBridgeMamaTransport_create (transportBridge*    result,
     return zmqBridgeMamaTransportImpl_start (impl);
 }
 
-mama_status
-zmqBridgeMamaTransport_forceClientDisconnect (transportBridge*   transports,
-                                              int                numTransports,
-                                              const char*        ipAddress,
-                                              uint16_t           port)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_findConnection (transportBridge*    transports,
-                                       int                 numTransports,
-                                       mamaConnection*     result,
-                                       const char*         ipAddress,
-                                       uint16_t            port)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_getAllConnections (transportBridge*    transports,
-                                          int                 numTransports,
-                                          mamaConnection**    result,
-                                          uint32_t*           len)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_getAllConnectionsForTopic (
-                    transportBridge*    transports,
-                    int                 numTransports,
-                    const char*         topic,
-                    mamaConnection**    result,
-                    uint32_t*           len)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_requestConflation (transportBridge*     transports,
-                                          int                  numTransports)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_requestEndConflation (transportBridge*  transports,
-                                             int               numTransports)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_getAllServerConnections (
-        transportBridge*        transports,
-        int                     numTransports,
-        mamaServerConnection**  result,
-        uint32_t*               len)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_freeAllServerConnections (
-        transportBridge*        transports,
-        int                     numTransports,
-        mamaServerConnection*   result,
-        uint32_t                len)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_freeAllConnections (transportBridge*    transports,
-                                           int                 numTransports,
-                                           mamaConnection*     result,
-                                           uint32_t            len)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_getNumLoadBalanceAttributes (
-        const char*     name,
-        int*            numLoadBalanceAttributes)
-{
-    if (NULL == numLoadBalanceAttributes || NULL == name)
-    {
-        return MAMA_STATUS_NULL_ARG;
-    }
-
-    *numLoadBalanceAttributes = 0;
-    return MAMA_STATUS_OK;
-}
-
-mama_status
-zmqBridgeMamaTransport_getLoadBalanceSharedObjectName (
-        const char*     name,
-        const char**    loadBalanceSharedObjectName)
-{
-    if (NULL == loadBalanceSharedObjectName)
-    {
-        return MAMA_STATUS_NULL_ARG;
-    }
-
-    *loadBalanceSharedObjectName = NULL;
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_getLoadBalanceScheme (const char*       name,
-                                             tportLbScheme*    scheme)
-{
-    if (NULL == scheme || NULL == name)
-    {
-        return MAMA_STATUS_NULL_ARG;
-    }
-
-    *scheme = TPORT_LB_SCHEME_STATIC;
-    return MAMA_STATUS_OK;
-}
-
-mama_status
-zmqBridgeMamaTransport_sendMsgToConnection (transportBridge    tport,
-                                            mamaConnection     connection,
-                                            mamaMsg            msg,
-                                            const char*        topic)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_isConnectionIntercepted (mamaConnection connection,
-                                                uint8_t*       result)
-{
-    if (NULL == result)
-    {
-        return MAMA_STATUS_NULL_ARG;
-    }
-
-    *result = 0;
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_installConnectConflateMgr (
-        transportBridge         handle,
-        mamaConflationManager   mgr,
-        mamaConnection          connection,
-        conflateProcessCb       processCb,
-        conflateGetMsgCb        msgCb)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_uninstallConnectConflateMgr (
-        transportBridge         handle,
-        mamaConflationManager   mgr,
-        mamaConnection          connection)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_startConnectionConflation (
-        transportBridge         tport,
-        mamaConflationManager   mgr,
-        mamaConnection          connection)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
-mama_status
-zmqBridgeMamaTransport_getNativeTransport (transportBridge     transport,
-                                           void**              result)
-{
-    zmqTransportBridge* impl = (zmqTransportBridge*)transport;
-
-    if (NULL == transport || NULL == result)
-    {
-        return MAMA_STATUS_NULL_ARG;
-    }
-    *result = impl;
-
-    return MAMA_STATUS_OK;
-}
-
-mama_status
-zmqBridgeMamaTransport_getNativeTransportNamingCtx (transportBridge transport,
-                                                    void**          result)
-{
-    return MAMA_STATUS_NOT_IMPLEMENTED;
-}
-
 
 /*=========================================================================
   =                  Public implementation functions                      =
@@ -982,7 +787,7 @@ zmqBridgeMamaTransportImpl_queueCallback (mamaQueue queue, void* closure)
     mamaQueue_getNativeHandle (queue, (void**)&queueImpl);
 
     // Return the memory node to the pool
-    pool = (memoryPool*) zmqBridgeMamaQueueImpl_getClosure ((queueBridge) queueImpl);
+    pool = (memoryPool*) baseBridgeMamaQueueImpl_getClosure ((queueBridge) queueImpl);
     memoryPool_returnNode (pool, node);
 
     return;
@@ -1135,11 +940,11 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
             queueImpl = (queueBridge) subscription->mZmqQueue;
 
             /* Get the memory pool from the queue, creating if necessary */
-            pool = (memoryPool*) zmqBridgeMamaQueueImpl_getClosure (queueImpl);
+            pool = (memoryPool*) baseBridgeMamaQueueImpl_getClosure (queueImpl);
             if (NULL == pool)
             {
                 pool = memoryPool_create (impl->mMemoryPoolSize, impl->mMemoryNodeSize);
-                zmqBridgeMamaQueueImpl_setClosure (queueImpl, pool,
+                baseBridgeMamaQueueImpl_setClosure (queueImpl, pool,
                         zmqBridgeMamaTransportImpl_queueClosureCleanupCb);
             }
 
@@ -1152,7 +957,7 @@ void* zmqBridgeMamaTransportImpl_dispatchThread (void* closure)
             memcpy (tmsg->mNodeBuffer, zmq_msg_data(&zmsg),tmsg->mNodeSize);
 
             // callback (queued) will release the message
-            zmqBridgeMamaQueue_enqueueEvent ((queueBridge) queueImpl,
+            baseBridgeMamaQueue_enqueueEvent ((queueBridge) queueImpl,
                     zmqBridgeMamaTransportImpl_queueCallback, node);
         }
     }
