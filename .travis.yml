@@ -20,5 +20,6 @@ script:
  - cmake -DOPENMAMA_SRC=$(pwd)/om_src -DCMAKE_INSTALL_PREFIX=$(pwd) .
  - make install
  - export LD_LIBRARY_PATH=/opt/openmama/lib:$(pwd)/lib
+ - export WOMBAT_PATH=$(pwd)/config:$(pwd)/om_src/mama/c_cpp/src/gunittest/c/:$(pwd)/om_src/mama/c_cpp/src/examples
  - ./bin/UnitTestMamaC -m zmq -p qpidmsg -i Q
  - ./bin/UnitTestMamaMiddlewareC -m zmq -p qpidmsg -i Q

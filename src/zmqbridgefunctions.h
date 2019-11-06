@@ -133,6 +133,12 @@ zmqBridgeMamaPublisher_sendReplyToInboxHandle (publisherBridge publisher,
 
 MAMAExpBridgeDLL
 extern mama_status
+zmqBridgeMamaPublisher_sendFromInbox (publisherBridge  publisher,
+                                      mamaInbox        inbox,
+                                      mamaMsg          msg);
+
+MAMAExpBridgeDLL
+extern mama_status
 zmqBridgeMamaPublisher_sendFromInboxByIndex (publisherBridge   publisher,
                                              int               tportIndex,
                                              mamaInbox         inbox,

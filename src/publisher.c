@@ -455,6 +455,17 @@ zmqBridgeMamaPublisher_sendReplyToInboxHandle (publisherBridge     publisher,
     return zmqBridgeMamaPublisher_send (publisher, reply);
 }
 
+mama_status
+zmqBridgeMamaPublisher_sendFromInbox (publisherBridge  publisher,
+                                      mamaInbox        inbox,
+                                      mamaMsg          msg)
+{
+    return zmqBridgeMamaPublisher_sendFromInboxByIndex (publisher,
+                                                         0,
+                                                         inbox,
+                                                         msg);
+}
+
 /* Send a message from the specified inbox using the throttle. */
 mama_status
 zmqBridgeMamaPublisher_sendFromInboxByIndex (publisherBridge   publisher,
@@ -462,7 +473,7 @@ zmqBridgeMamaPublisher_sendFromInboxByIndex (publisherBridge   publisher,
                                              mamaInbox         inbox,
                                              mamaMsg           msg)
 {
-    zmqPublisherBridge*    impl        = (zmqPublisherBridge*) publisher;
+    zmqPublisherBridge*     impl        = (zmqPublisherBridge*) publisher;
     const char*             replyAddr   = NULL;
     inboxBridge             inboxImpl   = NULL;
     mama_status             status      = MAMA_STATUS_OK;
