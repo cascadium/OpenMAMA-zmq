@@ -28,5 +28,6 @@ script:
  - ./bin/UnitTestMamaMiddlewareC -m zmq -p qpidmsg -i Q
 
 after_script:
+ - git clean -d -f -x
  - docker build -t openmama-zmq .
  - docker run -v $(pwd):/apps/src/bld --rm openmama-zmq
