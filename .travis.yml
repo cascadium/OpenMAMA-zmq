@@ -1,6 +1,9 @@
 language: c
 dist: bionic
 
+services:
+  - docker
+
 notifications:
   webhooks:
     urls:
@@ -23,3 +26,7 @@ script:
  - export WOMBAT_PATH=$(pwd)/config:$(pwd)/om_src/mama/c_cpp/src/gunittest/c/:$(pwd)/om_src/mama/c_cpp/src/examples
  - ./bin/UnitTestMamaC -m zmq -p qpidmsg -i Q
  - ./bin/UnitTestMamaMiddlewareC -m zmq -p qpidmsg -i Q
+
+after_script:
+ - docker build -t openmama-zmq .
+ - docker run -v $(pwd):/apps/src/bld --rm openmama-zmq
