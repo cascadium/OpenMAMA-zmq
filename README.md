@@ -1,3 +1,7 @@
+# This Repository is No Longer Maintained
+
+There is a fork of this project now actively maintained at [https://github.com/nyfix/OZ](https://github.com/nyfix/OZ). Please refer to that repository for future releases. This repository remains only for reference.
+
 # OpenMAMA ZeroMQ Middleware Bridge
 
 [![Join the chat at https://gitter.im/fquinner/OpenMAMA-zmq](https://badges.gitter.im/fquinner/OpenMAMA-zmq.svg)](https://gitter.im/fquinner/OpenMAMA-zmq?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
